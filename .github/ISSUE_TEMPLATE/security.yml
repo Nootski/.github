@@ -1,0 +1,51 @@
+name: Security Issue (non-sensitive)
+description: Report a non-sensitive security concern. For vulnerabilities, use private reporting — see SECURITY.md.
+title: "[SECURITY] "
+labels: ["security", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        > **Warning**
+        > If this is a vulnerability that could be exploited, **do NOT file a public issue**.
+        > Report privately via the process in [SECURITY.md](../blob/main/SECURITY.md).
+        >
+        > Use this template only for non-sensitive hardening suggestions,
+        > dependency warnings, or security questions.
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Perceived Severity
+      options:
+        - S1 - Critical
+        - S2 - High
+        - S3 - Medium
+        - S4 - Low / Informational
+    validations:
+      required: true
+
+  - type: textarea
+    id: affected
+    attributes:
+      label: Affected Component / Version
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Remediation
+
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I confirm this is not an exploitable vulnerability suitable for private disclosure
+          required: true

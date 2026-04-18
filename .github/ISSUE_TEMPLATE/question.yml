@@ -1,0 +1,22 @@
+name: Question / Support
+description: Ask a question about using this project
+title: "[QUESTION] "
+labels: ["question", "status:triage"]
+body:
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: What have you tried?
+      description: Share relevant context, docs you've read, or approaches you've attempted.
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment (if relevant)

@@ -1,0 +1,61 @@
+name: Feature Request
+description: Suggest a new feature or enhancement
+title: "[FEATURE] "
+labels: ["feature", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Propose a new feature. Focus on the problem you're trying to solve,
+        not just the solution.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user problem or need are we addressing?
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed_solution
+    attributes:
+      label: Proposed Solution
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives Considered
+
+  - type: textarea
+    id: users
+    attributes:
+      label: Target Users
+      description: Who benefits? How many? Persona?
+
+  - type: textarea
+    id: acceptance
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - [ ] User can ...
+        - [ ] When X, system does Y
+        - [ ] Documented in README
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options:
+        - High
+        - Medium
+        - Low
+    validations:
+      required: true
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Context / Mockups

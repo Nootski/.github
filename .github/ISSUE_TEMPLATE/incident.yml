@@ -1,0 +1,81 @@
+name: Incident
+description: Report a production incident or outage
+title: "[INCIDENT] "
+labels: ["incident", "status:triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this template to report a live incident or production issue.
+        For non-urgent bugs, use the Bug Report template instead.
+
+  - type: textarea
+    id: summary
+    attributes:
+      label: What is happening?
+      description: One-line summary of the incident.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      options:
+        - S1 - Critical (full outage / production down)
+        - S2 - High (major feature unavailable)
+        - S3 - Medium (degraded performance)
+        - S4 - Low (minor issue, limited impact)
+    validations:
+      required: true
+
+  - type: input
+    id: started
+    attributes:
+      label: When did it start?
+      placeholder: "2026-04-18 10:30 UTC"
+    validations:
+      required: true
+
+  - type: textarea
+    id: impact
+    attributes:
+      label: Impact
+      description: Who or what is affected? How many users? Which systems?
+    validations:
+      required: true
+
+  - type: textarea
+    id: detection
+    attributes:
+      label: How was it detected?
+      placeholder: Customer report, monitoring alert, self-discovered...
+
+  - type: textarea
+    id: current_status
+    attributes:
+      label: Current Status
+      description: What is happening right now? Is it mitigated?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actions
+    attributes:
+      label: Actions Taken / Timeline
+      placeholder: |
+        - 10:30 - Alert fired
+        - 10:32 - On-call engaged
+        - 10:40 - Rolled back deploy
+
+  - type: textarea
+    id: suspected_cause
+    attributes:
+      label: Suspected Cause (if known)
+
+  - type: checkboxes
+    id: post_incident
+    attributes:
+      label: Post-incident
+      options:
+        - label: Postmortem scheduled / RCA to follow

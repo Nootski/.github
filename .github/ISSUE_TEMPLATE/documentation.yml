@@ -1,0 +1,37 @@
+name: Documentation
+description: Report missing, incorrect or unclear documentation
+title: "[DOCS] "
+labels: ["documentation", "status:triage"]
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Where is the documentation issue?
+      description: Link, file path, or section name.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: type
+    attributes:
+      label: Type
+      options:
+        - Missing documentation
+        - Incorrect / outdated information
+        - Unclear explanation
+        - Typo / formatting
+        - Example or code snippet broken
+    validations:
+      required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What is the problem?
+    validations:
+      required: true
+
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested Improvement
