@@ -46,7 +46,9 @@ fi
 
 if [[ ${#REPOS[@]} -eq 0 ]]; then
   echo "No repos specified — fetching ALL repos for user Nootski..."
-  mapfile -t REPOS < <(gh repo list Nootski --limit 200 --json nameWithOwner --jq '.[].nameWithOwner')
+  while IFS= read -r line; do
+    REPOS+=("$line")
+  done < <(gh repo list Nootski --limit 200 --json nameWithOwner --jq '.[].nameWithOwner')
   echo "Found ${#REPOS[@]} repos."
 fi
 
