@@ -5,19 +5,23 @@ name: VPS Deploy (reusable)
 #   jobs:
 #     deploy:
 #       uses: Nootski/.github/.github/workflows/vps-deploy.yml@main
-#       secrets: inherit           # passes VPS_SSH_KEY + VPS_HOST automatically
+#       secrets: inherit
 #       with:
-#         service: "landal-whatsapp landal-chat-fastapi"
-#         deploy-path: "/var/www/landal-chat"
-#         post-deploy: "source venv/bin/activate && pip install -r requirements.txt"
+#         environment: VPS
+#         service: "my-service"
+#         deploy-path: "/var/www/my-project"
 #
-# Required repository secrets (set once per repo, or use org secrets):
-#   VPS_SSH_KEY   — private SSH key (contents of ~/.ssh/id_ed25519)
-#   VPS_HOST      — SSH connection string, e.g. root@95.216.243.227
+# Secrets (in the named environment or as repo secrets):
+#   VPS_SSH_KEY   — contents of ~/.ssh/id_ed25519
+#   VPS_HOST      — e.g. root@95.216.243.227
 
 on:
   workflow_call:
     inputs:
+      environment:
+        description: GitHub Environment name that holds VPS_SSH_KEY + VPS_HOST
+        type: string
+        default: VPS
       deploy-path:
         description: Absolute path on VPS where the project lives
         type: string
@@ -30,10 +34,6 @@ on:
         description: Extra shell command to run after git pull (e.g. pip install)
         type: string
         default: ""
-      python-version:
-        description: Python version (used for pip install)
-        type: string
-        default: "3.11"
     secrets:
       VPS_SSH_KEY:
         required: true
@@ -44,6 +44,7 @@ jobs:
   deploy:
     name: Deploy to VPS
     runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
 
     steps:
       - name: Set up SSH
