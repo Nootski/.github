@@ -1,0 +1,74 @@
+name: Python CI (reusable)
+
+# Reusable workflow — call this from any Python repo with:
+#
+#   jobs:
+#     ci:
+#       uses: Nootski/.github/.github/workflows/python-ci.yml@main
+#       with:
+#         python-version: "3.11"          # optional, default 3.11
+#         working-directory: "."          # optional, default repo root
+#         pytest-extra-args: "--ignore=Archive"  # optional
+
+on:
+  workflow_call:
+    inputs:
+      python-version:
+        description: Python version to use
+        type: string
+        default: "3.11"
+      working-directory:
+        description: Directory to run commands in (repo root by default)
+        type: string
+        default: "."
+      pytest-extra-args:
+        description: Extra arguments passed to pytest
+        type: string
+        default: "--ignore=Archive --ignore=Presentations"
+      ruff-extra-args:
+        description: Extra arguments passed to ruff
+        type: string
+        default: ""
+
+jobs:
+  ci:
+    name: Lint + Test + Security
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ${{ inputs.working-directory }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ inputs.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ inputs.python-version }}
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          # Dev tools (install separately so missing from requirements.txt is ok)
+          pip install ruff bandit pytest pytest-anyio anyio 2>/dev/null || true
+
+      - name: Ruff lint
+        run: ruff check . ${{ inputs.ruff-extra-args }}
+
+      - name: Pytest (unit tests — no LLM/DB)
+        run: |
+          python -m pytest ${{ inputs.pytest-extra-args }} \
+            --ignore=whatsapp/evals/test_component.py \
+            --ignore=whatsapp/evals/test_scenarios.py \
+            -v --tb=short
+        env:
+          # Prevent any accidental DB or OpenAI calls in unit tests
+          DATABASE_URL: ""
+          OPENAI_API_KEY: ""
+
+      - name: Bandit security scan
+        run: bandit -r . -c pyproject.toml -ll --exit-zero
+        # -ll = only report medium+ severity; --exit-zero = warn don't block
+        # Remove --exit-zero once baseline is clean

@@ -1,0 +1,80 @@
+name: VPS Deploy (reusable)
+
+# Reusable deploy workflow — call this from any repo with:
+#
+#   jobs:
+#     deploy:
+#       uses: Nootski/.github/.github/workflows/vps-deploy.yml@main
+#       secrets: inherit           # passes VPS_SSH_KEY + VPS_HOST automatically
+#       with:
+#         service: "landal-whatsapp landal-chat-fastapi"
+#         deploy-path: "/var/www/landal-chat"
+#         post-deploy: "source venv/bin/activate && pip install -r requirements.txt"
+#
+# Required repository secrets (set once per repo, or use org secrets):
+#   VPS_SSH_KEY   — private SSH key (contents of ~/.ssh/id_ed25519)
+#   VPS_HOST      — SSH connection string, e.g. root@95.216.243.227
+
+on:
+  workflow_call:
+    inputs:
+      deploy-path:
+        description: Absolute path on VPS where the project lives
+        type: string
+        required: true
+      service:
+        description: Space-separated systemd service name(s) to restart
+        type: string
+        required: true
+      post-deploy:
+        description: Extra shell command to run after git pull (e.g. pip install)
+        type: string
+        default: ""
+      python-version:
+        description: Python version (used for pip install)
+        type: string
+        default: "3.11"
+    secrets:
+      VPS_SSH_KEY:
+        required: true
+      VPS_HOST:
+        required: true
+
+jobs:
+  deploy:
+    name: Deploy to VPS
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.VPS_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          ssh-keyscan -H $(echo "${{ secrets.VPS_HOST }}" | cut -d@ -f2) >> ~/.ssh/known_hosts 2>/dev/null
+
+      - name: Pull latest code
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_HOST }} \
+            "cd ${{ inputs.deploy-path }} && git pull origin main"
+
+      - name: Run post-deploy steps
+        if: inputs.post-deploy != ''
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_HOST }} \
+            "cd ${{ inputs.deploy-path }} && ${{ inputs.post-deploy }}"
+
+      - name: Restart services
+        run: |
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_HOST }} \
+            "sudo systemctl restart ${{ inputs.service }}"
+
+      - name: Health check
+        run: |
+          sleep 5
+          ssh -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no \
+            ${{ secrets.VPS_HOST }} \
+            "systemctl is-active ${{ inputs.service }}"
