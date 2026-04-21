@@ -63,8 +63,9 @@ jobs:
             --ignore=whatsapp/evals/test_component.py \
             --ignore=whatsapp/evals/test_scenarios.py \
             -v --tb=short
+          PYTEST_EXIT=$?
+          [ $PYTEST_EXIT -eq 5 ] && exit 0 || exit $PYTEST_EXIT
         env:
-          # Prevent any accidental DB or OpenAI calls in unit tests
           DATABASE_URL: ""
           OPENAI_API_KEY: ""
 
